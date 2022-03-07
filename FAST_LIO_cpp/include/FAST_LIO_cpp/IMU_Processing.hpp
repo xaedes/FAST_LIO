@@ -29,9 +29,11 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <FAST_LIO_cpp/use-ikfom.hpp>
+#include <FAST_LIO_cpp/macro_defines.h>
 
 /// *************Preconfiguration
 
+#define G_m_s2 (9.81)         // Gravity const in GuangDong/China
 #define MAX_INI_COUNT (20)
 
 const bool time_list(PointType &x, PointType &y) {return (x.curvature < y.curvature);};
