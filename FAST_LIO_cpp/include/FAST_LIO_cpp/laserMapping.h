@@ -68,6 +68,7 @@ namespace fast_lio {
         using ImuProcess = TImuProcess;
 
         using PointType          = typename Common::PointType;
+        using PointVector        = typename Common::PointVector;
         using PointCloudXYZIPtr  = typename Common::PointCloudXYZIPtr;
         using Quaternion         = typename Common::Quaternion;
         using Odometry           = typename Common::Odometry;
@@ -129,8 +130,8 @@ namespace fast_lio {
         // BoxPointType comes from ikd_Tree.h
         std::vector<BoxPointType> cub_needrm; 
         std::vector<PointVector>  Nearest_Points; 
-        std::vector<double>       extrinT(3, 0.0);
-        std::vector<double>       extrinR(9, 0.0);
+        std::vector<double>       extrinT = std::vector<double>(3, 0.0);
+        std::vector<double>       extrinR = std::vector<double>(9, 0.0);
         std::deque<double>                   time_buffer;
         std::deque<PointCloudXYZIPtr>        lidar_buffer;
         std::deque<ImuConstPtr> imu_buffer;
@@ -199,16 +200,16 @@ namespace fast_lio {
         void pointBodyToWorld_ikfom(PointType const * const pi, PointType * const po, state_ikfom &s);
         void pointBodyToWorld(PointType const * const pi, PointType * const po);
         inline void dump_lio_state_to_log(FILE *fp);
-        template<typename T> void pointBodyToWorld(const Matrix<T, 3, 1> &pi, Matrix<T, 3, 1> &po);
+        template<class T> void pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po);
         void RGBpointBodyToWorld(PointType const * const pi, PointType * const po);
         void RGBpointBodyLidarToIMU(PointType const * const pi, PointType * const po);
 
         void points_cache_collect();
         void lasermap_fov_segment();
 
-        void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg);
-        void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg);
-        void imu_cbk(const ImuConstPtr &msg_in);
+        // void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg);
+        // void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg);
+        // void imu_cbk(const ImuConstPtr &msg_in);
 
         bool sync_packages(MeasureGroup &meas);
         void map_incremental();
@@ -269,12 +270,12 @@ namespace fast_lio {
         void observeLidar(double time, const PointCloudOuster& msg);
         void observeLidar(double time, const PointCloudVelodyne& msg);
 
-        CallbackPublish         cb_publish_frame_world;
-        CallbackPublish         cb_publish_frame_body;
-        CallbackPublish         cb_publish_effect_world;
-        CallbackPublish         cb_publish_map;
-        CallbackPublishOdometry cb_publish_odometry;
-        CallbackPublishPath     cb_publish_path;
+        CallbackPublishPointCloud  cb_publish_frame_world;
+        CallbackPublishPointCloud  cb_publish_frame_body;
+        CallbackPublishPointCloud  cb_publish_effect_world;
+        CallbackPublishPointCloud  cb_publish_map;
+        CallbackPublishOdometry    cb_publish_odometry;
+        CallbackPublishPath        cb_publish_path;
 
     };
 

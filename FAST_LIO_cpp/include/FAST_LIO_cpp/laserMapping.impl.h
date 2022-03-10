@@ -69,7 +69,7 @@
 // #include <ros/ros.h>
 
 #include <FAST_LIO_cpp/so3_math.h>
-#include <FAST_LIO_cpp/IMU_Processing.hpp>
+#include <FAST_LIO_cpp/IMU_Processing.h>
 
 // #include <tf/transform_datatypes.h>
 // #include <tf/transform_broadcaster.h>
@@ -102,9 +102,9 @@ namespace fast_lio {
         fflush(fp);
     }
 
-    template<typename T>
     FAST_LIO_LASER_MAPPING_TEMPLATE
-    void FAST_LIO_LASER_MAPPING_CLASS::pointBodyToWorld(const Matrix<T, 3, 1> &pi, Matrix<T, 3, 1> &po)
+    template<class T>
+    void FAST_LIO_LASER_MAPPING_CLASS::pointBodyToWorld(const Eigen::Matrix<T, 3, 1> &pi, Eigen::Matrix<T, 3, 1> &po)
     {
         V3D p_body(pi[0], pi[1], pi[2]);
         V3D p_global(state_point.rot * (state_point.offset_R_L_I*p_body + state_point.offset_T_L_I) + state_point.pos);
@@ -114,8 +114,8 @@ namespace fast_lio {
         po[2] = p_global(2);
     }
 
-    template<typename T>
     FAST_LIO_LASER_MAPPING_TEMPLATE
+    template<typename T>
     void FAST_LIO_LASER_MAPPING_CLASS::set_posestamp(T & out)
     {
         out.pose.position.x = state_point.pos(0);
@@ -128,13 +128,13 @@ namespace fast_lio {
     }
 
 
-    void SigHandle(int sig)
-    {
-        flg_exit = true;
-        printf("catch sig %d", sig);
-        // ROS_WARN("catch sig %d", sig);
-        sig_buffer.notify_all();
-    }
+    // void SigHandle(int sig)
+    // {
+    //     flg_exit = true;
+    //     printf("catch sig %d", sig);
+    //     // ROS_WARN("catch sig %d", sig);
+    //     sig_buffer.notify_all();
+    // }
 
     FAST_LIO_LASER_MAPPING_TEMPLATE
     void FAST_LIO_LASER_MAPPING_CLASS::pointBodyToWorld_ikfom(PointType const * const pi, PointType * const po, state_ikfom &s)

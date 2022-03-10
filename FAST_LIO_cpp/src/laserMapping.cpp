@@ -41,7 +41,8 @@ namespace fast_lio {
 // #define FAST_LIO_LASER_MAPPING_TEMPLATE template<class TCommon, class TPreprocess, class TImuProcess>
 // #define FAST_LIO_LASER_MAPPING_CLASS LaserMapping_<TCommon, TPreprocess, TImuProcess>
 
-template class LaserMappingCpp;
+//class LaserMappingCpp;
+    // using LaserMappingCpp = LaserMapping_<CommonCpp, PreprocessCpp, ImuProcessCpp>;
 
 /*
 int main(int argc, char** argv)
