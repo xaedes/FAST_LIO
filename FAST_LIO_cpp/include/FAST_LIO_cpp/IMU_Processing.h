@@ -56,12 +56,16 @@ class ImuProcess_
   using Pose6D = typename Common::Pose6D;
   using M3D = typename Common::M3D;
   using V3D = typename Common::V3D;
-  
+  using MeasureGroup = typename Common::MeasureGroup;
+
+  template<unsigned int Rows, unsigned int Cols>
+  using MD = Eigen::Matrix<double, Rows, Cols>;
+
   void Reset();
   void Reset(double start_timestamp, const ImuConstPtr &lastimu);
   void set_extrinsic(const V3D &transl, const M3D &rot);
   void set_extrinsic(const V3D &transl);
-  void set_extrinsic(const MD(4,4) &T);
+  void set_extrinsic(const MD<4,4> &T);
   void set_gyr_cov(const V3D &scaler);
   void set_acc_cov(const V3D &scaler);
   void set_gyr_bias_cov(const V3D &b_g);
@@ -143,7 +147,7 @@ void ImuProcess_<TCommon>::Reset()
 }
 
 template<class TCommon>
-void ImuProcess_<TCommon>::set_extrinsic(const MD(4,4) &T)
+void ImuProcess_<TCommon>::set_extrinsic(const MD<4,4> &T)
 {
   Lidar_T_wrt_IMU = T.block<3,1>(0,3);
   Lidar_R_wrt_IMU = T.block<3,3>(0,0);
