@@ -1,8 +1,13 @@
+#pragma once
 #include <FAST_LIO_cpp/common_lib.h>
 
 namespace fast_lio {
 
-    StatesGroup::StatesGroup(double initial_covariance) {
+#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
+#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
+
+    FAST_LIO_COMMON_TEMPLATE
+    FAST_LIO_COMMON_CLASS::StatesGroup::StatesGroup(double initial_covariance) {
         this->rot_end = M3D::Identity();
         this->pos_end = Zero3d;
         this->vel_end = Zero3d;
@@ -13,7 +18,8 @@ namespace fast_lio {
         this->cov.block<9,9>(9,9) = MD(9,9)::Identity() * 0.00001;
     };
 
-    StatesGroup::StatesGroup(const StatesGroup& b) {
+    FAST_LIO_COMMON_TEMPLATE
+    FAST_LIO_COMMON_CLASS::StatesGroup::StatesGroup(const StatesGroup& b) {
         this->rot_end = b.rot_end;
         this->pos_end = b.pos_end;
         this->vel_end = b.vel_end;
@@ -23,7 +29,8 @@ namespace fast_lio {
         this->cov     = b.cov;
     }
 
-    StatesGroup& StatesGroup::operator=(const StatesGroup& b)
+    FAST_LIO_COMMON_TEMPLATE
+    FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator=(const StatesGroup& b)
     {
         this->rot_end = b.rot_end;
         this->pos_end = b.pos_end;
@@ -35,7 +42,8 @@ namespace fast_lio {
         return *this;
     }
 
-    StatesGroup StatesGroup::operator+(const Eigen::Matrix<double, DIM_STATE, 1> &state_add)
+    FAST_LIO_COMMON_TEMPLATE
+    FAST_LIO_COMMON_CLASS::StatesGroup FAST_LIO_COMMON_CLASS::StatesGroup::operator+(const Eigen::Matrix<double, DIM_STATE, 1> &state_add)
     {
         StatesGroup a;
         a.rot_end = this->rot_end * Exp(state_add(0,0), state_add(1,0), state_add(2,0));
@@ -48,7 +56,8 @@ namespace fast_lio {
         return a;
     }
 
-    StatesGroup& StatesGroup::operator+=(const Matrix<double, DIM_STATE, 1> &state_add)
+    FAST_LIO_COMMON_TEMPLATE
+    FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator+=(const Matrix<double, DIM_STATE, 1> &state_add)
     {
         this->rot_end = this->rot_end * Exp(state_add(0,0), state_add(1,0), state_add(2,0));
         this->pos_end += state_add.block<3,1>(3,0);
@@ -59,7 +68,8 @@ namespace fast_lio {
         return *this;
     }
 
-    Eigen::Matrix<double, DIM_STATE, 1> StatesGroup::operator-(const StatesGroup& b)
+    FAST_LIO_COMMON_TEMPLATE
+    Eigen::Matrix<double, DIM_STATE, 1> FAST_LIO_COMMON_CLASS::StatesGroup::operator-(const StatesGroup& b)
     {
         Eigen::Matrix<double, DIM_STATE, 1> a;
         M3D rotd(b.rot_end.transpose() * this->rot_end);
@@ -72,11 +82,16 @@ namespace fast_lio {
         return a;
     }
 
-    void StatesGroup::resetpose()
+    FAST_LIO_COMMON_TEMPLATE
+    void FAST_LIO_COMMON_CLASS::StatesGroup::resetpose()
     {
         this->rot_end = M3D::Identity();
         this->pos_end = Zero3d;
         this->vel_end = Zero3d;
     }
+
+#undef FAST_LIO_COMMON_CLASS
+#undef FAST_LIO_COMMON_TEMPLATE
+
 
 } // namespace fast_lio

@@ -275,5 +275,6 @@ T deg2rad(T degrees)
 
 } // namespace fast_lio
 
+#include <FAST_LIO_cpp/common_lib.impl.h>
 
 #endif
