@@ -6,3 +6,5 @@ Log/*.pdf
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 PCD/*.pcd
+/FAST_LIO_cpp/.vs/
+/FAST_LIO_cpp/out/
