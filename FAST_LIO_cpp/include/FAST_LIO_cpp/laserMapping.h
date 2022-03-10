@@ -91,10 +91,10 @@ namespace fast_lio {
         using CallbackPublishPath = std::function<void(double time, const Path&)>;
 
     protected: // members
-        const double INIT_TIME = 0.1;
-        const double LASER_POINT_COV = 0.001;
-        const unsigned int MAXN = 720000;
-        const int PUBFRAME_PERIOD = 20;
+        static constexpr double INIT_TIME = 0.1;
+        static constexpr double LASER_POINT_COV = 0.001;
+        static constexpr unsigned int MAXN = 720000;
+        static constexpr int PUBFRAME_PERIOD = 20;
 
         /*** Time Log Variables ***/
         double kdtree_incremental_time = 0.0, kdtree_search_time = 0.0, kdtree_delete_time = 0.0;
