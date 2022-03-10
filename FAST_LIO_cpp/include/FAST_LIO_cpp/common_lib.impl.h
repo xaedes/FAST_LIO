@@ -14,7 +14,7 @@ namespace fast_lio {
         this->bias_g  = Zero3d;
         this->bias_a  = Zero3d;
         this->gravity = Zero3d;
-        this->cov     = MD(DIM_STATE,DIM_STATE)::Identity() * initial_covariance;
+        this->cov     = MD(DimState::value,DimState::value)::Identity() * initial_covariance;
         this->cov.block<9,9>(9,9) = MD(9,9)::Identity() * 0.00001;
     };
 
@@ -30,7 +30,7 @@ namespace fast_lio {
     }
 
     FAST_LIO_COMMON_TEMPLATE
-    FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator=(const StatesGroup& b)
+    typename FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator=(const StatesGroup& b)
     {
         this->rot_end = b.rot_end;
         this->pos_end = b.pos_end;
@@ -43,7 +43,7 @@ namespace fast_lio {
     }
 
     FAST_LIO_COMMON_TEMPLATE
-    FAST_LIO_COMMON_CLASS::StatesGroup FAST_LIO_COMMON_CLASS::StatesGroup::operator+(const Eigen::Matrix<double, DIM_STATE, 1> &state_add)
+    typename FAST_LIO_COMMON_CLASS::StatesGroup FAST_LIO_COMMON_CLASS::StatesGroup::operator+(const StateMatrix &state_add)
     {
         StatesGroup a;
         a.rot_end = this->rot_end * Exp(state_add(0,0), state_add(1,0), state_add(2,0));
@@ -57,7 +57,7 @@ namespace fast_lio {
     }
 
     FAST_LIO_COMMON_TEMPLATE
-    FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator+=(const Matrix<double, DIM_STATE, 1> &state_add)
+    typename FAST_LIO_COMMON_CLASS::StatesGroup& FAST_LIO_COMMON_CLASS::StatesGroup::operator+=(const StateMatrix &state_add)
     {
         this->rot_end = this->rot_end * Exp(state_add(0,0), state_add(1,0), state_add(2,0));
         this->pos_end += state_add.block<3,1>(3,0);
@@ -69,9 +69,9 @@ namespace fast_lio {
     }
 
     FAST_LIO_COMMON_TEMPLATE
-    Eigen::Matrix<double, DIM_STATE, 1> FAST_LIO_COMMON_CLASS::StatesGroup::operator-(const StatesGroup& b)
+    typename FAST_LIO_COMMON_CLASS::StatesGroup::StateMatrix FAST_LIO_COMMON_CLASS::StatesGroup::operator-(const StatesGroup& b)
     {
-        Eigen::Matrix<double, DIM_STATE, 1> a;
+        StateMatrix a;
         M3D rotd(b.rot_end.transpose() * this->rot_end);
         a.block<3,1>(0,0)  = Log(rotd);
         a.block<3,1>(3,0)  = this->pos_end - b.pos_end;

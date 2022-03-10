@@ -106,14 +106,14 @@ struct Common_
     {
         using DimState = std::integral_constant<unsigned int, 18>; // Dimension of states (Let Dim(SO(3)) = 3)
         using DimProcN = std::integral_constant<unsigned int, 12>; // Dimension of process noise (Let Dim(SO(3)) = 3), unused
-
+        using StateMatrix = Eigen::Matrix<double, DimState::value, 1>;
         StatesGroup(double initial_covariance = 1.0);
         StatesGroup(const StatesGroup& b);
 
         StatesGroup& operator=(const StatesGroup& b);
-        StatesGroup operator+(const Eigen::Matrix<double, DimState, 1> &state_add);
-        StatesGroup& operator+=(const Eigen::Matrix<double, DimState, 1> &state_add);
-        Eigen::Matrix<double, DimState, 1> operator-(const StatesGroup& b);
+        StatesGroup operator+(const StateMatrix &state_add);
+        StatesGroup& operator+=(const StateMatrix &state_add);
+        StateMatrix operator-(const StatesGroup& b);
 
         void resetpose();
 
@@ -123,7 +123,7 @@ struct Common_
         V3D bias_g;       // gyroscope bias
         V3D bias_a;       // accelerator bias
         V3D gravity;      // the estimated gravity acceleration
-        Eigen::Matrix<double, DimState, DimState>  cov;     // states covariance
+        Eigen::Matrix<double, DimState::value, DimState::value>  cov;     // states covariance
     };
 
 
@@ -237,10 +237,10 @@ struct Common_
 
 #define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
 #define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
-FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::M3D FAST_LIO_COMMON_CLASS::Eye3d(M3D::Identity());
-FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::M3F FAST_LIO_COMMON_CLASS::Eye3d(M3F::Identity());
-FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::V3D FAST_LIO_COMMON_CLASS::Zero3d(0,0,0);
-FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::V3F FAST_LIO_COMMON_CLASS::Zero3f(0,0,0);
+FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::M3D FAST_LIO_COMMON_CLASS::Eye3d(FAST_LIO_COMMON_CLASS::M3D::Identity());
+FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::M3F FAST_LIO_COMMON_CLASS::Eye3f(FAST_LIO_COMMON_CLASS::M3F::Identity());
+FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::V3D FAST_LIO_COMMON_CLASS::Zero3d(0,0,0);
+FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::V3F FAST_LIO_COMMON_CLASS::Zero3f(0,0,0);
 #undef FAST_LIO_COMMON_CLASS
 #undef FAST_LIO_COMMON_TEMPLATE
 
