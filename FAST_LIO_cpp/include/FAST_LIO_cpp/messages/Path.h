@@ -9,7 +9,7 @@ namespace fast_lio {
     /**
      * An array of poses that represents a Path for a robot to follow.
      */
-    struct PoseStamped
+    struct Path
     {
         Header header{};
         std::vector<PoseStamped> poses{};
