@@ -48,21 +48,21 @@ void Preprocess_<TCommon>::set(bool feat_en, int lid_type, double bld, int pfilt
 }
 
 template<class TCommon>
-void Preprocess_<TCommon>::process(const PointCloudLivox &msg, PointCloudXYZI::Ptr &pcl_out)
+void Preprocess_<TCommon>::process(const PointCloudLivox &msg, PointCloudXYZIPtr &pcl_out)
 {  
   avia_handler(msg);
   *pcl_out = pl_surf;
 }
 
 template<class TCommon>
-void Preprocess_<TCommon>::process(const PointCloudOuster &msg, PointCloudXYZI::Ptr &pcl_out)
+void Preprocess_<TCommon>::process(const PointCloudOuster &msg, PointCloudXYZIPtr &pcl_out)
 {
   oust64_handler(msg);
   *pcl_out = pl_surf;
 }
 
 template<class TCommon>
-void Preprocess_<TCommon>::process(const PointCloudVelodyne &msg, PointCloudXYZI::Ptr &pcl_out)
+void Preprocess_<TCommon>::process(const PointCloudVelodyne &msg, PointCloudXYZIPtr &pcl_out)
 {
   velodyne_handler(msg);
   *pcl_out = pl_surf;
@@ -75,7 +75,7 @@ void Preprocess_<TCommon>::avia_handler(const PointCloudLivox &msg)
   pl_corn.clear();
   pl_full.clear();
   double t1 = omp_get_wtime();
-  int plsize = msg.point_num;
+  int plsize = msg.point_num; // todo: try to just use msg.points.size()
   // cout<<"plsie: "<<plsize<<endl;
 
   pl_corn.reserve(plsize);

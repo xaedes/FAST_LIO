@@ -18,6 +18,16 @@ template<class TCommon>
 class Preprocess_
 {
   public:
+  using Common = TCommon;
+
+  using PointCloudLivox    = typename Common::PointCloudLivox;
+  using PointCloudOuster   = typename Common::PointCloudOuster;
+  using PointCloudVelodyne = typename Common::PointCloudVelodyne;
+
+  using PointType         = typename Common::PointType;
+  using PointCloudXYZI    = typename Common::PointCloudXYZI;
+  using PointCloudXYZIPtr = typename Common::PointCloudXYZIPtr;
+
   enum LID_TYPE{AVIA = 1, VELO16, OUST64}; //{1, 2, 3}
   enum Feature{Nor, Poss_Plane, Real_Plane, Edge_Jump, Edge_Plane, Wire, ZeroPoint};
   enum Surround{Prev, Next};
@@ -41,21 +51,17 @@ class Preprocess_
     }
   };
 
-  using Common = TCommon;
-  using PointType = typename Common::PointType;
-  using PointCloudXYZI = typename Common::PointCloudXYZI;
-
 //   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   Preprocess_();
   ~Preprocess_();
   
-  void process(const PointCloudLivox &msg, PointCloudXYZI::Ptr &pcl_out);
-  void process(const PointCloudOuster &msg, PointCloudXYZI::Ptr &pcl_out);
-  void process(const PointCloudVelodyne &msg, PointCloudXYZI::Ptr &pcl_out);
+  void process(const PointCloudLivox &msg, PointCloudXYZIPtr &pcl_out);
+  void process(const PointCloudOuster &msg, PointCloudXYZIPtr &pcl_out);
+  void process(const PointCloudVelodyne &msg, PointCloudXYZIPtr &pcl_out);
 
-  // void process(const livox_ros_driver::CustomMsg::ConstPtr &msg, PointCloudXYZI::Ptr &pcl_out);
-  // void process(const sensor_msgs::PointCloud2::ConstPtr &msg, PointCloudXYZI::Ptr &pcl_out);
+  // void process(const livox_ros_driver::CustomMsg::ConstPtr &msg, PointCloudXYZIPtr &pcl_out);
+  // void process(const sensor_msgs::PointCloud2::ConstPtr &msg, PointCloudXYZIPtr &pcl_out);
   
   void set(bool feat_en, int lid_type, double bld, int pfilt_num);
 
