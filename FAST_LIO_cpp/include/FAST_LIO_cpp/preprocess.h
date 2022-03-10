@@ -76,6 +76,7 @@ class Preprocess_
     
 
   private:
+  using uint = unsigned int;
   void avia_handler(const PointCloudLivox &msg);
   void oust64_handler(const PointCloudOuster &msg);
   void velodyne_handler(const PointCloudVelodyne &msg);

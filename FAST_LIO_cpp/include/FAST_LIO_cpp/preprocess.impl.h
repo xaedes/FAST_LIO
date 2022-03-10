@@ -117,7 +117,7 @@ void Preprocess_<TCommon>::avia_handler(const PointCloudLivox &msg)
     for(int j=0; j<N_SCANS; j++)
     {
       if(pl_buff[j].size() <= 5) continue;
-      pcl::PointCloud<PointType> &pl = pl_buff[j];
+      PointCloudXYZI &pl = pl_buff[j];
       plsize = pl.size();
       std::vector<orgtype> &types = typess[j];
       types.clear();
@@ -438,7 +438,7 @@ void Preprocess_<TCommon>::velodyne_handler(const PointCloudVelodyne &pl_orig)
 }
 
 template<class TCommon>
-void Preprocess_<TCommon>::give_feature(pcl::PointCloud<PointType> &pl, std::vector<orgtype> &types)
+void Preprocess_<TCommon>::give_feature(PointCloudXYZI &pl, std::vector<orgtype> &types)
 {
   int plsize = pl.size();
   int plsize2;
