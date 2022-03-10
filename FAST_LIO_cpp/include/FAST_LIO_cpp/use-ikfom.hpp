@@ -3,6 +3,8 @@
 
 #include <FAST_LIO_cpp/IKFoM_toolkit/esekfom/esekfom.hpp>
 
+namespace fast_lio {
+
 typedef MTK::vect<3, double> vect3;
 typedef MTK::SO3<double> SO3;
 typedef MTK::S2<double, 98090, 10000, 1> S2; 
@@ -122,5 +124,7 @@ vect3 SO3ToEuler(const SO3 &orient)
 		// euler_ang[0] = roll, euler_ang[1] = pitch, euler_ang[2] = yaw
 	return euler_ang;
 }
+
+} // namespace fast_lio
 
 #endif
