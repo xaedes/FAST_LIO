@@ -14,29 +14,54 @@
 
 #include <FAST_LIO_cpp/messages/Pose6D.h>
 #include <FAST_LIO_cpp/messages/Imu.h>
+#include <FAST_LIO_cpp/messages/Quaternion.h>
 #include <FAST_LIO_cpp/messages/Odometry.h>
+#include <FAST_LIO_cpp/messages/Path.h>
+#include <FAST_LIO_cpp/messages/PoseStamped.h>
 
-#include <tf/transform_broadcaster.h>
-#include <eigen_conversions/eigen_msg.h>
+#include <FAST_LIO_cpp/messages/lidars/PointCloudLivox.h>
+#include <FAST_LIO_cpp/messages/lidars/PointCloudOuster.h>
+#include <FAST_LIO_cpp/messages/lidars/PointCloudVelodyne.h>
+
+// #include <tf/transform_broadcaster.h>
+// #include <eigen_conversions/eigen_msg.h>
 
 namespace fast_lio {
 
 template<
-    class TPose6D,         // fast_lio::Pose6D
-    class TImu,            // fast_lio::Imu
-    class TPointType,      // pcl::PointXYZINormal
-    class TPointCloudXYZI, // pcl::PointCloud<PointType>
+    class TPose6D,             // fast_lio::Pose6D
+    class TImu,                // fast_lio::Imu
+    class TQuaternion,         // fast_lio::Quaternion
+    class TOdometry,           // fast_lio::Odometry
+    class TPath,               // fast_lio::Path
+    class TPoseStamped,        // fast_lio::PoseStamped
+    class TPointCloudLivox,    // fast_lio::PointCloudLivox
+    class TPointCloudOuster,   // fast_lio::PointCloudOuster
+    class TPointCloudVelodyne, // fast_lio::PointCloudVelodyne
+    class TPointType,          // pcl::PointXYZINormal
+    class TPointCloudXYZI,     // pcl::PointCloud<PointType>
     unsigned int TNumMatchPoints = 5
 >
 struct Common_
 {
     using Pose6D = TPose6D;
     using Imu = TImu;
+
+    using Quaternion         = TQuaternion; // TODO add to template
+    using Odometry           = TOdometry; // TODO add to template
+    using Path               = TPath; // TODO add to template
+    using PoseStamped        = TPoseStamped; // TODO add to template
+    using PointCloudLivox    = TPointCloudLivox; // TODO add to template
+    using PointCloudOuster   = TPointCloudOuster; // TODO add to template
+    using PointCloudVelodyne = TPointCloudVelodyne; // TODO add to template
+
     using PointType = TPointType;
     using PointCloudXYZI = TPointCloudXYZI;
+
     using NumMatchPoints = std::integral_constant<unsigned int, TNumMatchPoints>;
 
     using PointCloudXYZIPtr = typename PointCloudXYZI::Ptr;
+    using ImuPtr = typename Imu::Ptr;
     using ImuConstPtr = typename Imu::ConstPtr;
 
     using PointVector = std::vector<PointType, Eigen::aligned_allocator<PointType>>;
@@ -63,7 +88,7 @@ struct Common_
     static const V3D Zero3d;
     static const V3F Zero3f;
 
-    struct MeasureGroup     // Lidar data and imu dates for the curent process
+    struct MeasureGroup     // Lidar data and imu dates for the current process
     {
         MeasureGroup()
         {
@@ -73,7 +98,7 @@ struct Common_
         double lidar_beg_time;
         double lidar_end_time;
         PointCloudXYZIPtr lidar;
-        std::deque<ImuConstPtr> imu;
+        std::deque<ImuConstPtr> imu; 
     };
 
     // unused
@@ -103,7 +128,7 @@ struct Common_
 
 
     template<typename T>
-    auto set_pose6d(
+    static auto set_pose6d(
         const double t, 
         const Eigen::Matrix<T, 3, 1> &a, 
         const Eigen::Matrix<T, 3, 1> &g,
@@ -133,7 +158,7 @@ struct Common_
     normvec:  normalized x0
     */
     template<typename T>
-    bool esti_normvector(
+    static bool esti_normvector(
         Eigen::Matrix<T, 3, 1> &normvec, 
         const PointVector &point, 
         const T &threshold, 
@@ -165,13 +190,13 @@ struct Common_
     }
 
     // todo: rename to calc_dist2 as it returns squared distance
-    float calc_dist(PointType p1, PointType p2){
+    static float calc_dist(PointType p1, PointType p2){
         float d2 = (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z);
         return d2;
     }
 
     template<typename T>
-    bool esti_plane(
+    static bool esti_plane(
         Eigen::Matrix<T, 4, 1> &pca_result, 
         const PointVector &point, 
         const T &threshold
@@ -210,16 +235,25 @@ struct Common_
 
 };
 
-#define FAST_LIO_COMMON_CLASS_DECL template <class A, class B, class C, class D, unsigned int E>
-FAST_LIO_COMMON_CLASS_DECL const Common_<A,B,C,D,E>::M3D Common_<A,B,C,D,E>::Eye3d(M3D::Identity());
-FAST_LIO_COMMON_CLASS_DECL const Common_<A,B,C,D,E>::M3F Common_<A,B,C,D,E>::Eye3d(M3F::Identity());
-FAST_LIO_COMMON_CLASS_DECL const Common_<A,B,C,D,E>::V3D Common_<A,B,C,D,E>::Zero3d(0,0,0);
-FAST_LIO_COMMON_CLASS_DECL const Common_<A,B,C,D,E>::V3F Common_<A,B,C,D,E>::Zero3f(0,0,0);
-#undef FAST_LIO_COMMON_CLASS_DECL
+#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
+#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
+FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::M3D FAST_LIO_COMMON_CLASS::Eye3d(M3D::Identity());
+FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::M3F FAST_LIO_COMMON_CLASS::Eye3d(M3F::Identity());
+FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::V3D FAST_LIO_COMMON_CLASS::Zero3d(0,0,0);
+FAST_LIO_COMMON_TEMPLATE const FAST_LIO_COMMON_CLASS::V3F FAST_LIO_COMMON_CLASS::Zero3f(0,0,0);
+#undef FAST_LIO_COMMON_CLASS
+#undef FAST_LIO_COMMON_TEMPLATE
 
 using CommonCpp = Common_<
     fast_lio::Pose6D,
     fast_lio::Imu,
+    fast_lio::Quaternion,
+    fast_lio::Odometry,
+    fast_lio::Path,
+    fast_lio::PoseStamped,
+    fast_lio::PointCloudLivox,
+    fast_lio::PointCloudOuster,
+    fast_lio::PointCloudVelodyne,
     pcl::PointXYZINormal,
     pcl::PointCloud<pcl::PointXYZINormal>,
     5
