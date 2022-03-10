@@ -1,0 +1,14 @@
+
+Goal: Create new cmake library independent of ros with functionality of FAST_LIO
+
+Copy old code into seperate directory containing the new library.
+
+Remove ros dependencies from new code.
+Replace fast_lio dependencies in old code with library usage.
+
+A lot of functions directly accept ROS messages. 
+This makes it efficient for usage in ROS, but it needs ROS to build the header files.
+We want to keep performance, but make ROS optional.
+The interface for the messages is well defined and can be trivially mirrored in simple structs.
+The code working on message data will then be templated to accept both simple structs and ROS messages.
+
