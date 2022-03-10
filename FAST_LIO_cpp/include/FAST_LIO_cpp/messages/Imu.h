@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <FAST_LIO_cpp/messages/Header.h>
 #include <FAST_LIO_cpp/messages/Quaternion.h>
 #include <FAST_LIO_cpp/messages/Vector3.h>
@@ -8,6 +9,9 @@ namespace fast_lio {
 
     struct Imu
     {
+        using Ptr = std::shared_ptr<Imu>;
+        using ConstPtr = std::shared_ptr<const Imu>;
+        
         Header header{};
         Quaternion orientation{};
         double orientation_covariance[9]; // Row major about x, y, z axes
