@@ -39,6 +39,7 @@
 
 
 
+#include <iomanip>
 #include <omp.h>
 #include <math.h>
 #include <fstream>
@@ -83,7 +84,6 @@ namespace fast_lio {
 
     #define FAST_LIO_LASER_MAPPING_TEMPLATE template<class TCommon, class TPreprocess, class TImuProcess>
     #define FAST_LIO_LASER_MAPPING_CLASS LaserMapping_<TCommon, TPreprocess, TImuProcess>
-
 
     FAST_LIO_LASER_MAPPING_TEMPLATE
     inline void FAST_LIO_LASER_MAPPING_CLASS::dump_lio_state_to_log(FILE *fp)  
@@ -414,9 +414,9 @@ namespace fast_lio {
                     PointNoNeedDownsample.push_back(feats_down_world->points[i]);
                     continue;
                 }
-                for (int readd_i = 0; readd_i < NUM_MATCH_POINTS; readd_i ++)
+                for (int readd_i = 0; readd_i < NumMatchPoints::value; readd_i ++)
                 {
-                    if (points_near.size() < NUM_MATCH_POINTS) break;
+                    if (points_near.size() < NumMatchPoints::value) break;
                     if (Common::calc_dist(points_near[readd_i], mid_point) < dist)
                     {
                         need_add = false;
@@ -483,7 +483,7 @@ namespace fast_lio {
             if (pcl_wait_save->size() > 0 && pcd_save_interval > 0  && scan_wait_num >= pcd_save_interval)
             {
                 pcd_index ++;
-                std::string all_points_dir(std::string(std::string(ROOT_DIR) + "PCD/scans_") + std::to_string(pcd_index) + std::string(".pcd"));
+                std::string all_points_dir(std::string(std::string(FAST_LIO_ROOT_DIR) + "PCD/scans_") + std::to_string(pcd_index) + std::string(".pcd"));
                 pcl::PCDWriter pcd_writer;
                 std::cout << "current scan saved to /PCD/" << all_points_dir << std::endl;
                 pcd_writer.writeBinary(all_points_dir, *pcl_wait_save);
@@ -618,20 +618,20 @@ namespace fast_lio {
             point_world.z = p_global(2);
             point_world.intensity = point_body.intensity;
 
-            std::vector<float> pointSearchSqDis(NUM_MATCH_POINTS);
+            std::vector<float> pointSearchSqDis(NumMatchPoints::value);
 
             auto &points_near = Nearest_Points[i];
 
             if (ekfom_data.converge)
             {
                 /** Find the closest surfaces in the map **/
-                ikdtree.Nearest_Search(point_world, NUM_MATCH_POINTS, points_near, pointSearchSqDis);
-                point_selected_surf[i] = points_near.size() < NUM_MATCH_POINTS ? false : pointSearchSqDis[NUM_MATCH_POINTS - 1] > 5 ? false : true;
+                ikdtree.Nearest_Search(point_world, NumMatchPoints::value, points_near, pointSearchSqDis);
+                point_selected_surf[i] = points_near.size() < NumMatchPoints::value ? false : pointSearchSqDis[NumMatchPoints::value - 1] > 5 ? false : true;
             }
 
             if (!point_selected_surf[i]) continue;
 
-            VF(4) pabcd;
+            Common::VF<4> pabcd;
             point_selected_surf[i] = false;
             if (Common::esti_plane(pabcd, points_near, 0.1f))
             {
@@ -676,7 +676,7 @@ namespace fast_lio {
         double solve_start_  = omp_get_wtime();
         
         /*** Computation of Measuremnt Jacobian matrix H and measurents vector ***/
-        ekfom_data.h_x = MatrixXd::Zero(effct_feat_num, 12); //23
+        ekfom_data.h_x = Eigen::MatrixXd::Zero(effct_feat_num, 12); //23
         ekfom_data.h.resize(effct_feat_num);
 
         for (int i = 0; i < effct_feat_num; i++)
@@ -684,10 +684,10 @@ namespace fast_lio {
             const PointType &laser_p  = laserCloudOri->points[i];
             V3D point_this_be(laser_p.x, laser_p.y, laser_p.z);
             M3D point_be_crossmat;
-            point_be_crossmat << SKEW_SYM_MATRX(point_this_be);
+            point_be_crossmat << FAST_LIO_SKEW_SYM_MATRIX(point_this_be);
             V3D point_this = s.offset_R_L_I * point_this_be + s.offset_T_L_I;
             M3D point_crossmat;
-            point_crossmat<<SKEW_SYM_MATRX(point_this);
+            point_crossmat << FAST_LIO_SKEW_SYM_MATRIX(point_this);
 
             /*** get the normal vector of closest surface/corner ***/
             const PointType &norm_p = corr_normvect->points[i];
@@ -699,11 +699,11 @@ namespace fast_lio {
             if (extrinsic_est_en)
             {
                 V3D B(point_be_crossmat * s.offset_R_L_I.conjugate() * C); //s.rot.conjugate()*norm_vec);
-                ekfom_data.h_x.block<1, 12>(i,0) << norm_p.x, norm_p.y, norm_p.z, VEC_FROM_ARRAY(A), VEC_FROM_ARRAY(B), VEC_FROM_ARRAY(C);
+                ekfom_data.h_x.block<1, 12>(i,0) << norm_p.x, norm_p.y, norm_p.z, FAST_LIO_VEC_FROM_ARRAY(A), FAST_LIO_VEC_FROM_ARRAY(B), FAST_LIO_VEC_FROM_ARRAY(C);
             }
             else
             {
-                ekfom_data.h_x.block<1, 12>(i,0) << norm_p.x, norm_p.y, norm_p.z, VEC_FROM_ARRAY(A), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+                ekfom_data.h_x.block<1, 12>(i,0) << norm_p.x, norm_p.y, norm_p.z, FAST_LIO_VEC_FROM_ARRAY(A), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
             }
 
             /*** Measuremnt: distance to the closest surface/corner ***/
@@ -764,8 +764,8 @@ namespace fast_lio {
         memset(point_selected_surf, true, sizeof(point_selected_surf));
         memset(res_last, -1000.0f, sizeof(res_last));
 
-        Lidar_T_wrt_IMU << VEC_FROM_ARRAY(extrinT);
-        Lidar_R_wrt_IMU << MAT_FROM_ARRAY(extrinR);
+        Lidar_T_wrt_IMU << FAST_LIO_VEC_FROM_ARRAY(extrinT);
+        Lidar_R_wrt_IMU << FAST_LIO_MAT_FROM_ARRAY(extrinR);
         p_imu->set_extrinsic(Lidar_T_wrt_IMU, Lidar_R_wrt_IMU);
         p_imu->set_gyr_cov(V3D(gyr_cov, gyr_cov, gyr_cov));
         p_imu->set_acc_cov(V3D(acc_cov, acc_cov, acc_cov));
@@ -773,20 +773,24 @@ namespace fast_lio {
         p_imu->set_acc_bias_cov(V3D(b_acc_cov, b_acc_cov, b_acc_cov));
 
         double epsi[23] = {0.001};
-        fill(epsi, epsi+23, 0.001);
-        kf.init_dyn_share(get_f, df_dx, df_dw, h_share_model, NUM_MAX_ITERATIONS, epsi);
+        std::fill(epsi, epsi+23, 0.001);
+        kf.init_dyn_share(
+            get_f, df_dx, df_dw, 
+            [this](auto &s, auto &ekfom_data){ this->h_share_model(s, ekfom_data); }, 
+            NUM_MAX_ITERATIONS, epsi
+        );
 
         /*** debug record ***/
         std::string pos_log_dir = root_dir + "/Log/pos_log.txt";
         fp = fopen(pos_log_dir.c_str(),"w");
 
-        fout_pre.open(DEBUG_FILE_DIR("mat_pre.txt"),std::ios::out);
-        fout_out.open(DEBUG_FILE_DIR("mat_out.txt"),std::ios::out);
-        fout_dbg.open(DEBUG_FILE_DIR("dbg.txt"),std::ios::out);
+        fout_pre.open(FAST_LIO_DEBUG_FILE_DIR("mat_pre.txt"),std::ios::out);
+        fout_out.open(FAST_LIO_DEBUG_FILE_DIR("mat_out.txt"),std::ios::out);
+        fout_dbg.open(FAST_LIO_DEBUG_FILE_DIR("dbg.txt"),std::ios::out);
         if (fout_pre && fout_out)
-            std::cout << "~~~~"<<ROOT_DIR<<" file opened" << std::endl;
+            std::cout << "~~~~"<< FAST_LIO_ROOT_DIR<<" file opened" << std::endl;
         else
-            std::cout << "~~~~"<<ROOT_DIR<<" doesn't exist" << std::endl;
+            std::cout << "~~~~"<< FAST_LIO_ROOT_DIR<<" doesn't exist" << std::endl;
 
 
     }
@@ -801,7 +805,7 @@ namespace fast_lio {
             first_lidar_time = Measures.lidar_beg_time;
             p_imu->first_lidar_time = first_lidar_time;
             flg_first_scan = false;
-            continue;
+            return;
         }
 
         double t0,t1,t2,t3,t4,t5,match_start, solve_start, svd_time;
@@ -815,17 +819,18 @@ namespace fast_lio {
 
         p_imu->Process(Measures, kf, feats_undistort);
         state_point = kf.get_x();
-        pos_lid = state_point.pos + state_point.rot * state_point.offset_T_L_I;
+
+        // ambiguous operator*, use operator that performs rotation of row-vector matrix 'offset_T_L_I'
+        pos_lid = state_point.pos + state_point.rot * static_cast<typename vect3::base>(state_point.offset_T_L_I);
 
         if (feats_undistort->empty() || (feats_undistort == NULL))
         {
             printf("No point, skip this scan!\n");
             // ROS_WARN("No point, skip this scan!\n");
-            continue;
+            return;
         }
 
         flg_EKF_inited = (Measures.lidar_beg_time - first_lidar_time) < INIT_TIME ? \
-                        false : true;
                         false : true;
         /*** Segment the map in lidar FOV ***/
         lasermap_fov_segment();
@@ -848,7 +853,7 @@ namespace fast_lio {
                 }
                 ikdtree.Build(feats_down_world->points);
             }
-            continue;
+            return;
         }
         int featsFromMapNum = ikdtree.validnum();
         kdtree_size_st = ikdtree.size();
@@ -862,14 +867,14 @@ namespace fast_lio {
             // printf("No point, skip this scan!\n");
             printf("No point, skip this scan!\n");
             // ROS_WARN("No point, skip this scan!\n");
-            continue;
+            return;
         }
         
         normvec->resize(feats_down_size);
         feats_down_world->resize(feats_down_size);
 
         V3D ext_euler = SO3ToEuler(state_point.offset_R_L_I);
-        fout_pre<<setw(20)<<Measures.lidar_beg_time - first_lidar_time<<" "<<euler_cur.transpose()<<" "<< state_point.pos.transpose()<<" "<<ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<< " " << state_point.vel.transpose() \
+        fout_pre<<std::setw(20)<<Measures.lidar_beg_time - first_lidar_time<<" "<<euler_cur.transpose()<<" "<< state_point.pos.transpose()<<" "<<ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<< " " << state_point.vel.transpose() \
         <<" "<<state_point.bg.transpose()<<" "<<state_point.ba.transpose()<<" "<<state_point.grav<< std::endl;
 
         if(0) // If you need to see map point, change to "if(1)"
@@ -893,7 +898,8 @@ namespace fast_lio {
         kf.update_iterated_dyn_share_modified(LASER_POINT_COV, solve_H_time);
         state_point = kf.get_x();
         euler_cur = SO3ToEuler(state_point.rot);
-        pos_lid = state_point.pos + state_point.rot * state_point.offset_T_L_I;
+        // ambiguous operator*, use operator that performs rotation of row-vector matrix 'offset_T_L_I'
+        pos_lid = state_point.pos + state_point.rot * static_cast<typename vect3::base>(state_point.offset_T_L_I);
         geoQuat.x = state_point.rot.coeffs()[0];
         geoQuat.y = state_point.rot.coeffs()[1];
         geoQuat.z = state_point.rot.coeffs()[2];
@@ -902,7 +908,7 @@ namespace fast_lio {
         double t_update_end = omp_get_wtime();
 
         /******* Publish odometry *******/
-        publish_odometry(pubOdomAftMapped);
+        publish_odometry();
 
         /*** add the feature points to map kdtree ***/
         t3 = omp_get_wtime();
@@ -910,11 +916,11 @@ namespace fast_lio {
         t5 = omp_get_wtime();
         
         /******* Publish points *******/
-        if (path_en)                         publish_path(pubPath);
-        if (scan_pub_en || pcd_save_en)      publish_frame_world(pubLaserCloudFull);
-        if (scan_pub_en && scan_body_pub_en) publish_frame_body(pubLaserCloudFull_body);
-        // publish_effect_world(pubLaserCloudEffect);
-        // publish_map(pubLaserCloudMap);
+        if (path_en)                         publish_path();
+        if (scan_pub_en || pcd_save_en)      publish_frame_world();
+        if (scan_pub_en && scan_body_pub_en) publish_frame_body();
+        // publish_effect_world();
+        // publish_map();
 
         /*** Debug variables ***/
         if (runtime_pos_log)
@@ -941,7 +947,7 @@ namespace fast_lio {
             time_log_counter ++;
             printf("[ mapping ]: time: IMU + Map + Input Downsample: %0.6f ave match: %0.6f ave solve: %0.6f  ave ICP: %0.6f  map incre: %0.6f ave total: %0.6f icp: %0.6f construct H: %0.6f \n",t1-t0,aver_time_match,aver_time_solve,t3-t1,t5-t3,aver_time_consu,aver_time_icp, aver_time_const_H_time);
             ext_euler = SO3ToEuler(state_point.offset_R_L_I);
-            fout_out << setw(20) << Measures.lidar_beg_time - first_lidar_time << " " << euler_cur.transpose() << " " << state_point.pos.transpose()<< " " << ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<<" "<< state_point.vel.transpose() \
+            fout_out << std::setw(20) << Measures.lidar_beg_time - first_lidar_time << " " << euler_cur.transpose() << " " << state_point.pos.transpose()<< " " << ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<<" "<< state_point.vel.transpose() \
             <<" "<<state_point.bg.transpose()<<" "<<state_point.ba.transpose()<<" "<<state_point.grav<<" "<<feats_undistort->points.size()<<std::endl;
             dump_lio_state_to_log(fp);
         }
@@ -957,7 +963,7 @@ namespace fast_lio {
         if (pcl_wait_save->size() > 0 && pcd_save_en)
         {
             std::string file_name = std::string("scans.pcd");
-            std::string all_points_dir(std::string(std::string(ROOT_DIR) + "PCD/") + file_name);
+            std::string all_points_dir(std::string(std::string(FAST_LIO_ROOT_DIR) + "PCD/") + file_name);
             pcl::PCDWriter pcd_writer;
             std::cout << "current scan saved to /PCD/" << file_name<<std::endl;
             pcd_writer.writeBinary(all_points_dir, *pcl_wait_save);
@@ -1098,6 +1104,7 @@ namespace fast_lio {
         mtx_buffer.unlock();
         sig_buffer.notify_all();
     }
+
 
 
     #undef FAST_LIO_LASER_MAPPING_TEMPLATE

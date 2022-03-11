@@ -221,7 +221,7 @@ struct Common_
             A(j,2) = point[j].z;
         }
 
-        Matrix<T, 3, 1> normvec = A.colPivHouseholderQr().solve(b);
+        Eigen::Matrix<T, 3, 1> normvec = A.colPivHouseholderQr().solve(b);
 
         T n = normvec.norm();
         pca_result(0) = normvec(0) / n;

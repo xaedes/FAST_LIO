@@ -1,8 +1,9 @@
 #pragma once
 
-#define VEC_FROM_ARRAY(v)        v[0],v[1],v[2]
-#define MAT_FROM_ARRAY(v)        v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8]
-#define DEBUG_FILE_DIR(name)     (std::string(std::string(ROOT_DIR) + "Log/"+ name))
+#define FAST_LIO_VEC_FROM_ARRAY(v)        v[0],v[1],v[2]
+#define FAST_LIO_MAT_FROM_ARRAY(v)        v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8]
+#define FAST_LIO_DEBUG_FILE_DIR(name)     (std::string(std::string(FAST_LIO_ROOT_DIR) + "Log/"+ name))
+#define FAST_LIO_SKEW_SYM_MATRIX(v) 0.0,-v[2],v[1],v[2],0.0,-v[0],-v[1],v[0],0.0
 
 // unused:
 // #define MAX_MEAS_DIM        (10000)

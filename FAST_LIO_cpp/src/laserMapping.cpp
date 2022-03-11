@@ -38,6 +38,14 @@
 
 namespace fast_lio {
 
+    void force_compilation()
+    {
+        LaserMappingCpp mapping;
+        mapping.setup(LaserMappingCpp::Parameters());
+        mapping.update();
+        mapping.finish();
+    }
+
 // #define FAST_LIO_LASER_MAPPING_TEMPLATE template<class TCommon, class TPreprocess, class TImuProcess>
 // #define FAST_LIO_LASER_MAPPING_CLASS LaserMapping_<TCommon, TPreprocess, TImuProcess>
 

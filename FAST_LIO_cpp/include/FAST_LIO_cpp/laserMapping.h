@@ -84,6 +84,8 @@ namespace fast_lio {
         using Imu                = typename Common::Imu;
         using ImuPtr             = typename Common::ImuPtr;
         using ImuConstPtr        = typename Common::ImuConstPtr;
+        
+        using NumMatchPoints     = typename Common::NumMatchPoints;
 
         using V3F  = typename Common::V3F;
         using V3D  = typename Common::V3D;
@@ -116,7 +118,7 @@ namespace fast_lio {
         std::mutex mtx_buffer;
         std::condition_variable sig_buffer;
 
-        std::string root_dir = ROOT_DIR;
+        std::string root_dir = FAST_LIO_ROOT_DIR;
         std::string map_file_path, lid_topic, imu_topic;
 
         double res_mean_last = 0.05, total_residual = 0.0;
@@ -284,6 +286,8 @@ namespace fast_lio {
     };
 
     using LaserMappingCpp = LaserMapping_<CommonCpp, PreprocessCpp, ImuProcessCpp>;
+
+    void force_compilation();
 
 } // namespace fast_lio
 

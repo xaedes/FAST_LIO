@@ -37,6 +37,7 @@
 
 
 #include <vector>
+#include <functional>
 #include <cstdlib>
 
 #include <boost/bind.hpp>
@@ -118,21 +119,38 @@ public:
 	typedef SparseMatrix<scalar_type> spMt;
 	typedef Matrix<scalar_type, n, 1> vectorized_state;
 	typedef Matrix<scalar_type, m, 1> flatted_state;
-	typedef flatted_state processModel(state &, const input &);
-	typedef Eigen::Matrix<scalar_type, m, n> processMatrix1(state &, const input &);
-	typedef Eigen::Matrix<scalar_type, m, process_noise_dof> processMatrix2(state &, const input &);
+
+	typedef std::function<flatted_state(state &, const input &)> processModel;
+	typedef std::function<Eigen::Matrix<scalar_type, m, n> (state &, const input &)> processMatrix1;
+	typedef std::function<Eigen::Matrix<scalar_type, m, process_noise_dof> (state &, const input &)> processMatrix2;
 	typedef Eigen::Matrix<scalar_type, process_noise_dof, process_noise_dof> processnoisecovariance;
-	typedef measurement measurementModel(state &, bool &);
-	typedef measurement measurementModel_share(state &, share_datastruct<state, measurement, measurement_noise_dof> &);
-	typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, 1> measurementModel_dyn(state &, bool &);
-	//typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, 1> measurementModel_dyn_share(state &,  dyn_share_datastruct<scalar_type> &);
-	typedef void measurementModel_dyn_share(state &,  dyn_share_datastruct<scalar_type> &);
-	typedef Eigen::Matrix<scalar_type ,l, n> measurementMatrix1(state &, bool&);
-	typedef Eigen::Matrix<scalar_type , Eigen::Dynamic, n> measurementMatrix1_dyn(state &, bool&);
-	typedef Eigen::Matrix<scalar_type ,l, measurement_noise_dof> measurementMatrix2(state &, bool&);
-	typedef Eigen::Matrix<scalar_type ,Eigen::Dynamic, Eigen::Dynamic> measurementMatrix2_dyn(state &, bool&);
+	typedef std::function<measurement(state &, bool &)> measurementModel;
+	typedef std::function<measurement(state &, share_datastruct<state, measurement, measurement_noise_dof> &)> measurementModel_share;
+	typedef std::function<Eigen::Matrix<scalar_type, Eigen::Dynamic, 1>(state &, bool &)> measurementModel_dyn;
+	//typedef std::function<Eigen::Matrix<scalar_type, Eigen::Dynamic, 1>(state &,  dyn_share_datastruct<scalar_type> &)> measurementModel_dyn_share;
+	typedef std::function<void(state &,  dyn_share_datastruct<scalar_type> &)> measurementModel_dyn_share;
+	typedef std::function<Eigen::Matrix<scalar_type, l, n>(state &, bool&)> measurementMatrix1;
+	typedef std::function<Eigen::Matrix<scalar_type, Eigen::Dynamic, n>(state &, bool&)> measurementMatrix1_dyn;
+	typedef std::function<Eigen::Matrix<scalar_type, l, measurement_noise_dof>(state &, bool&)> measurementMatrix2;
+	typedef std::function<Eigen::Matrix<scalar_type, Eigen::Dynamic, Eigen::Dynamic>(state &, bool&)> measurementMatrix2_dyn;
 	typedef Eigen::Matrix<scalar_type, measurement_noise_dof, measurement_noise_dof> measurementnoisecovariance;
 	typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, Eigen::Dynamic> measurementnoisecovariance_dyn;
+
+	// typedef flatted_state processModel(state &, const input &);
+	// typedef Eigen::Matrix<scalar_type, m, n> processMatrix1(state &, const input &);
+	// typedef Eigen::Matrix<scalar_type, m, process_noise_dof> processMatrix2(state &, const input &);
+	// typedef Eigen::Matrix<scalar_type, process_noise_dof, process_noise_dof> processnoisecovariance;
+	// typedef measurement measurementModel(state &, bool &);
+	// typedef measurement measurementModel_share(state &, share_datastruct<state, measurement, measurement_noise_dof> &);
+	// typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, 1> measurementModel_dyn(state &, bool &);
+	// //typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, 1> measurementModel_dyn_share(state &,  dyn_share_datastruct<scalar_type> &);
+	// typedef void measurementModel_dyn_share(state &,  dyn_share_datastruct<scalar_type> &);
+	// typedef Eigen::Matrix<scalar_type ,l, n> measurementMatrix1(state &, bool&);
+	// typedef Eigen::Matrix<scalar_type , Eigen::Dynamic, n> measurementMatrix1_dyn(state &, bool&);
+	// typedef Eigen::Matrix<scalar_type ,l, measurement_noise_dof> measurementMatrix2(state &, bool&);
+	// typedef Eigen::Matrix<scalar_type ,Eigen::Dynamic, Eigen::Dynamic> measurementMatrix2_dyn(state &, bool&);
+	// typedef Eigen::Matrix<scalar_type, measurement_noise_dof, measurement_noise_dof> measurementnoisecovariance;
+	// typedef Eigen::Matrix<scalar_type, Eigen::Dynamic, Eigen::Dynamic> measurementnoisecovariance_dyn;
 
 	esekf(const state &x = state(),
 		const cov  &P = cov::Identity()): x_(x), P_(P){
@@ -1963,20 +1981,20 @@ private:
 	cov F_x2 = cov::Identity();
 	cov L_ = cov::Identity();
 
-	processModel *f;
-	processMatrix1 *f_x;
-	processMatrix2 *f_w;
+	processModel f;
+	processMatrix1 f_x;
+	processMatrix2 f_w;
 
-	measurementModel *h;
-	measurementMatrix1 *h_x;
-	measurementMatrix2 *h_v;
+	measurementModel h;
+	measurementMatrix1 h_x;
+	measurementMatrix2 h_v;
 
-	measurementModel_dyn *h_dyn;
-	measurementMatrix1_dyn *h_x_dyn;
-	measurementMatrix2_dyn *h_v_dyn;
+	measurementModel_dyn h_dyn;
+	measurementMatrix1_dyn h_x_dyn;
+	measurementMatrix2_dyn h_v_dyn;
 
-	measurementModel_share *h_share;
-	measurementModel_dyn_share *h_dyn_share;
+	measurementModel_share h_share;
+	measurementModel_dyn_share h_dyn_share;
 
 	int maximum_iter = 0;
 	scalar_type limit[n];

@@ -3,12 +3,11 @@
 
 #include <math.h>
 #include <Eigen/Core>
+#include <FAST_LIO_cpp/macro_defines.h>
 // #include <opencv2/core.hpp>
 // #include <common_lib.h>
 
 namespace fast_lio { 
-
-    #define FAST_LIO_SKEW_SYM_MATRX(v) 0.0,-v[2],v[1],v[2],0.0,-v[0],-v[1],v[0],0.0
 
     template<typename T>
     Eigen::Matrix<T, 3, 3> Exp(const Eigen::Matrix<T, 3, 1> &&ang)
@@ -102,8 +101,6 @@ namespace fast_lio {
     //     }
     // }
     
-    #undef FAST_LIO_SKEW_SYM_MATRX
-
 } // namespace fast_lio
 
 #endif
