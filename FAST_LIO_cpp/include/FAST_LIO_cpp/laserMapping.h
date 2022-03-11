@@ -69,6 +69,7 @@ namespace fast_lio {
 
         using PointType          = typename Common::PointType;
         using PointVector        = typename Common::PointVector;
+        using PointCloudXYZI     = typename Common::PointCloudXYZI;
         using PointCloudXYZIPtr  = typename Common::PointCloudXYZIPtr;
         using Quaternion         = typename Common::Quaternion;
         using Odometry           = typename Common::Odometry;
