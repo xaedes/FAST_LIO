@@ -3,8 +3,8 @@
 
 namespace fast_lio {
 
-#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
-#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
+#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointLivox, class TPointOuster, class TPointVelodyne, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
+#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointLivox, TPointOuster, TPointVelodyne, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
 
     FAST_LIO_COMMON_TEMPLATE
     FAST_LIO_COMMON_CLASS::StatesGroup::StatesGroup(double initial_covariance) {

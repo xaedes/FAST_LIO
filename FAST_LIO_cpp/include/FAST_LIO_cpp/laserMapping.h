@@ -74,6 +74,9 @@ namespace fast_lio {
         using Odometry           = typename Common::Odometry;
         using Path               = typename Common::Path;
         using PoseStamped        = typename Common::PoseStamped;
+        using PointLivox         = typename Common::PointLivox;
+        using PointOuster        = typename Common::PointOuster;
+        using PointVelodyne      = typename Common::PointVelodyne;
         using PointCloudLivox    = typename Common::PointCloudLivox;
         using PointCloudOuster   = typename Common::PointCloudOuster;
         using PointCloudVelodyne = typename Common::PointCloudVelodyne;

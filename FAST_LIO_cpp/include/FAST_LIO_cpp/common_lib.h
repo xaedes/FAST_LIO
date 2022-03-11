@@ -35,6 +35,9 @@ template<
     class TOdometry,           // fast_lio::Odometry
     class TPath,               // fast_lio::Path
     class TPoseStamped,        // fast_lio::PoseStamped
+    class TPointLivox,         // fast_lio::PointLivox
+    class TPointOuster,        // fast_lio::PointOuster
+    class TPointVelodyne,      // fast_lio::PointVelodyne
     class TPointCloudLivox,    // fast_lio::PointCloudLivox
     class TPointCloudOuster,   // fast_lio::PointCloudOuster
     class TPointCloudVelodyne, // fast_lio::PointCloudVelodyne
@@ -47,13 +50,16 @@ struct Common_
     using Pose6D = TPose6D;
     using Imu = TImu;
 
-    using Quaternion         = TQuaternion; // TODO add to template
-    using Odometry           = TOdometry; // TODO add to template
-    using Path               = TPath; // TODO add to template
-    using PoseStamped        = TPoseStamped; // TODO add to template
-    using PointCloudLivox    = TPointCloudLivox; // TODO add to template
-    using PointCloudOuster   = TPointCloudOuster; // TODO add to template
-    using PointCloudVelodyne = TPointCloudVelodyne; // TODO add to template
+    using Quaternion         = TQuaternion; 
+    using Odometry           = TOdometry; 
+    using Path               = TPath; 
+    using PoseStamped        = TPoseStamped; 
+    using PointLivox         = TPointLivox; 
+    using PointOuster        = TPointOuster; 
+    using PointVelodyne      = TPointVelodyne; 
+    using PointCloudLivox    = TPointCloudLivox; 
+    using PointCloudOuster   = TPointCloudOuster; 
+    using PointCloudVelodyne = TPointCloudVelodyne; 
 
     using PointType = TPointType;
     using PointCloudXYZI = TPointCloudXYZI;
@@ -235,8 +241,8 @@ struct Common_
 
 };
 
-#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
-#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
+#define FAST_LIO_COMMON_TEMPLATE template<class TPose6D, class TImu, class TQuaternion, class TOdometry, class TPath, class TPoseStamped, class TPointLivox, class TPointOuster, class TPointVelodyne, class TPointCloudLivox, class TPointCloudOuster, class TPointCloudVelodyne, class TPointType, class TPointCloudXYZI, unsigned int TNumMatchPoints>
+#define FAST_LIO_COMMON_CLASS Common_<TPose6D, TImu, TQuaternion, TOdometry, TPath, TPoseStamped, TPointLivox, TPointOuster, TPointVelodyne, TPointCloudLivox, TPointCloudOuster, TPointCloudVelodyne, TPointType, TPointCloudXYZI, TNumMatchPoints>
 FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::M3D FAST_LIO_COMMON_CLASS::Eye3d(FAST_LIO_COMMON_CLASS::M3D::Identity());
 FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::M3F FAST_LIO_COMMON_CLASS::Eye3f(FAST_LIO_COMMON_CLASS::M3F::Identity());
 FAST_LIO_COMMON_TEMPLATE const typename FAST_LIO_COMMON_CLASS::V3D FAST_LIO_COMMON_CLASS::Zero3d(0,0,0);
@@ -251,6 +257,9 @@ using CommonCpp = Common_<
     fast_lio::Odometry,
     fast_lio::Path,
     fast_lio::PoseStamped,
+    fast_lio::PointLivox,
+    fast_lio::PointOuster,
+    fast_lio::PointVelodyne,
     fast_lio::PointCloudLivox,
     fast_lio::PointCloudOuster,
     fast_lio::PointCloudVelodyne,
