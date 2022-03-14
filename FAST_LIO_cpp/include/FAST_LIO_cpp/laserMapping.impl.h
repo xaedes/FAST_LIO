@@ -1011,8 +1011,7 @@ namespace fast_lio {
         if (timestamp < last_timestamp_imu)
         {
             printf("imu loop back, clear buffer");
-            // printf("imu loop back, clear buffer");
-            ROS_WARN("imu loop back, clear buffer");
+            // ROS_WARN("imu loop back, clear buffer");
             imu_buffer.clear();
         }
 
