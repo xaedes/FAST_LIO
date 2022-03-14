@@ -262,8 +262,8 @@ namespace fast_lio {
             bool         mapping_extrinsic_est_en      = true            ;
             bool         pcd_save_pcd_save_en          = false           ;
             int          pcd_save_interval             = -1              ;
-            std::vector<double> mapping_extrinsic_T    = std::vector<double>();
-            std::vector<double> mapping_extrinsic_R    = std::vector<double>();
+            std::vector<double> mapping_extrinsic_T    = {0.0,0.0,0.0};
+            std::vector<double> mapping_extrinsic_R    = {1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0};
         };
         void setup(const Parameters& params);
 
