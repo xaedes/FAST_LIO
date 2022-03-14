@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
-# TODO
 add_library(
     ${PROJECT_NAME} 
-    STATIC 
+    SHARED  
     include/${PROJECT_NAME}/ikd-Tree/ikd_Tree.cpp
     src/laserMapping.cpp
 )
