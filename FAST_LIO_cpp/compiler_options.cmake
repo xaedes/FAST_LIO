@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 
 # set(CMAKE_CXX_EXTENSIONS OFF)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-target_compile_options(${PROJECT_NAME} PUBLIC -fexceptions)
 # target_compile_options(${PROJECT_NAME} PUBLIC -O3)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DFAST_LIO_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\")
 
@@ -12,6 +11,7 @@ if (MSVC)
 else ()
   # -Wa,option: Pass option as an option to the assembler. If option contains commas, it is split into multiple options at the commas.
   target_compile_options(${PROJECT_NAME} PUBLIC -Wa,-mbig-obj)
+  target_compile_options(${PROJECT_NAME} PUBLIC -fexceptions)
 endif ()
 
 message("Current CPU architecture: ${CMAKE_SYSTEM_PROCESSOR}")
