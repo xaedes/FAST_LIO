@@ -656,8 +656,8 @@ namespace fast_lio {
         {
             if (point_selected_surf[i])
             {
-                laserCloudOri->points[effct_feat_num] = feats_down_body->points[i];
-                corr_normvect->points[effct_feat_num] = normvec->points[i];
+                laserCloudOri->points.push_back(feats_down_body->points[i]);
+                corr_normvect->points.push_back(normvec->points[i]);
                 total_residual += res_last[i];
                 effct_feat_num ++;
             }
