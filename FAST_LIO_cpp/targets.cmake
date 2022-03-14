@@ -17,4 +17,3 @@ target_include_directories(
 target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PCL_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
